@@ -17,11 +17,26 @@ La historia parece lineal, pero en cierto momento permite **viajar en el tiempo*
 
 ## Cómo jugar
 
-Abre `index.html` en el navegador. Es un único archivo sin dependencias. También puedes servirlo en local:
+Requisitos: Node 20.19+ (o 22.12+).
 
 ```bash
-python3 -m http.server 8000   # y abre http://localhost:8000
+npm install
+npm run dev        # y abre http://localhost:5173
 ```
+
+### Abrir una escena en un estado concreto
+
+Añade `?state=<nombre>` a la URL. Los estados con nombre están en [`src/presets.ts`](src/presets.ts):
+
+| Estado | Qué abre |
+|---|---|
+| `new-game` (por defecto) | Habitación, con el diálogo de introducción |
+| `room` | Habitación, sin introducción |
+| `street` | Calle, junto a la puerta de casa |
+| `street-genetech` | Calle, frente a la puerta de Gene-Tech |
+| `field` | Campo de pruebas |
+
+Cualquier estado se puede ajustar con `scene`, `x`, `y`, `dir` (`down`, `up`, `left`, `right`) y `flags` (lista separada por comas: `nombre` vale `true`; `nombre=valor` admite números, `true`/`false` o texto). Por ejemplo, `/?state=street&x=600&flags=metBoss,day=2`. Si `scene` cambia de escena, la posición del estado base se descarta.
 
 | Acción | Móvil | Teclado |
 |---|---|---|
@@ -33,8 +48,16 @@ python3 -m http.server 8000   # y abre http://localhost:8000
 ## Estructura
 
 ```
-index.html              ← juego construido (NO editar a mano: se genera)
-src/game.html           ← código del juego (HTML + CSS + JS, canvas 2D sin librerías)
+index.html              ← página y estilos; carga src/main.ts
+src/
+  main.ts               ← arranque desde la URL, bucle, cambio de escena, cámara y dibujado
+  state.ts, presets.ts  ← estado de partida (escena, posición, flags) y estados con nombre
+  core.ts               ← lienzo, estado del mundo, partículas, polígonos
+  input.ts              ← teclado, joystick y botones
+  sprites.ts, player.ts ← fotogramas de Jessica, coleta, disparo
+  dialogue.ts           ← diálogos con retrato
+  scenes/               ← una escena por módulo (room, street, field) y su registro
+e2e/                    ← pruebas de Playwright (móvil emulado)
 assets/
   sprites/jessica.json  ← todos los fotogramas de Jessica (paleta + filas de píxeles + capa de coleta)
   ui/portrait_jessica.png
@@ -42,18 +65,20 @@ assets/
   street/               ← edificios, buildings.json, suelo, ciudad de fondo
   vehicles/             ← carrocerías, tiras de ruedas (12 giros) y vehicles.json
   source/               ← imágenes originales de Gemini (entrada del pipeline)
-tools/
-  build.py              ← genera index.html incrustando assets en src/game.html
-  art/                  ← pipeline de arte (ver abajo)
+tools/art/              ← pipeline de arte (ver abajo)
 ```
 
-## Construir
+## Construir y probar
 
 ```bash
-python3 tools/build.py
+npm run build      # typecheck + build en dist/ (sirve en cualquier hosting estático)
+npm test           # pruebas unitarias (Vitest)
+npm run test:e2e   # pruebas en navegador (Playwright); capturas de cada estado en screenshots/
 ```
 
-Sustituye en `src/game.html` los marcadores `__ASSET:ruta.png__` (por la imagen como data URL) y `__ASSET_JSON:ruta.json__` (por el contenido del JSON) y escribe `index.html`.
+La primera vez, `npx playwright install chromium` descarga el navegador de las pruebas.
+
+Cada escena es un módulo aparte: al arrancar solo se descarga el motor, Jessica y la escena actual. Las escenas vecinas, las que hay detrás de cada salida, se precargan en segundo plano, y el fundido a negro espera si alguna aún no ha llegado.
 
 ## Pipeline de arte (de imágenes de Gemini a pixel art del juego)
 
@@ -76,7 +101,7 @@ Requisitos: Python 3 con `Pillow`, `numpy` y `scipy`.
 | `tools/art/process_vehicles.py` | Vehículos de perfil: escala real, sin sombra y 12 fotogramas de giro por rueda, rotados en alta resolución. |
 | `tools/art/view.py`, `zoomset.py` | Vistas ampliadas con cuadrícula para revisar y retocar. |
 
-Cada script se ejecuta con `python3 tools/art/<script>.py` y después `python3 tools/build.py`. Todos reproducen exactamente los recursos actuales.
+Cada script se ejecuta con `python3 tools/art/<script>.py`; con `npm run dev` levantado, el juego se recarga solo. Todos reproducen exactamente los recursos actuales. Los JSON que generan apuntan a sus imágenes con marcadores `__ASSET:ruta.png__`, que el código de cada escena convierte en la URL final.
 
 ### Escalas de referencia
 - Pantalla: **224×224** px internos, escalados sin suavizado.
@@ -88,9 +113,10 @@ Cada script se ejecuta con `python3 tools/art/<script>.py` y después `python3 t
 - Personajes: una pose por dirección y situación; la animación se hace por piezas.
 - Vehículos: de perfil, mirando a la derecha y con las ruedas enteras.
 
-## Arquitectura de `src/game.html`
+## Arquitectura
 
-- **Escenas por datos (`SCN`):** cada escena define imagen o `drawBg`, polígono caminable (`poly`), límites de bala (`bpoly`), puntos para examinar (`hs` / `hsFn`), salidas (`exits`, con fundido a negro), flechas de salida (`marks`) y tinte de luz.
+- **Escenas (`src/scenes/`):** cada módulo exporta `load()`, que descarga sus imágenes y devuelve un objeto `Scene` (ver [`scene.ts`](src/scenes/scene.ts)): `drawBg`, zona caminable (`blocked`), choque de balas (`bulletHit`), puntos para examinar (`hotspot`), salidas (`exits`, con fundido a negro), flechas de salida (`marks`), tinte de luz y, opcionalmente, `enter`, `update`, `drawables` y `drawFront`. Para añadir una escena: crea el módulo, regístralo en [`scenes/index.ts`](src/scenes/index.ts) y añade su id a `SceneId` en [`state.ts`](src/state.ts).
+- **Estado de partida:** `world.flags` guarda lo que ha pasado (por ejemplo `introSeen`); el estado inicial sale de la URL.
 - **Jugador:** `curFrame()` elige el fotograma según dirección y estado (idle / walk / run, con o sin disparo). La izquierda es la derecha reflejada.
 - **Coleta:** capa separada con muelle amortiguado (balanceo) y 6 fases de onda (viento al correr).
 - **Balas con altura:** la colisión usa la posición en el suelo (`y + h`), no la de pantalla.
@@ -99,7 +125,6 @@ Cada script se ejecuta con `python3 tools/art/<script>.py` y después `python3 t
 
 ## Próximos pasos
 
-- Separar `src/game.html` en módulos: entrada, jugador, escenas, tráfico, diálogos y render.
 - Sistema de historia: guion, variables, viajes en el tiempo y varios finales.
 - El mundo 3D con cámara giratoria de la idea original.
 - Más personajes y NPCs con el mismo pipeline, y retratos con varias expresiones.
