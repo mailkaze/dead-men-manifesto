@@ -1,17 +1,19 @@
 import portraitUrl from '../assets/ui/portrait_jessica.png';
-import { V, ctx, mk, world } from './core';
+import { V, ctx, world } from './core';
 import { inp } from './input';
 import { pl } from './player';
+import { LINE_H, beginText, clearText, fitTextLayer, wrap } from './text';
 
-// Diálogos con retrato. El texto se dibuja en una capa al doble de resolución
-// y se umbraliza para que se vea pixelado.
+// Diálogos con retrato; el texto va en su propia capa nítida (ver text.ts).
 const POR = new Image();
 POR.src = portraitUrl;
 const tcv = document.getElementById('txt') as HTMLCanvasElement, tcx = tcv.getContext('2d')!;
-const tmp = mk(448, 448), tmx = tmp.getContext('2d', { willReadFrequently: true })!;
 
 let dlg: { q: string[]; i: number; n: number } | null = null;
 let lastTxt = '';
+
+fitTextLayer(tcv);
+addEventListener('resize', () => { if (fitTextLayer(tcv)) lastTxt = ''; });
 
 export function say(q: string[]) { dlg = { q, i: 0, n: 0 }; }
 export function isTalking() { return dlg !== null; }
@@ -32,20 +34,9 @@ export function dialogueUpdate(dt: number): boolean {
   return true;
 }
 
-function wrap(s: string, maxW: number) {
-  const words = s.split(' '), lines: string[] = [];
-  let cur = '';
-  for (const w of words) {
-    const tst = cur ? cur + ' ' + w : w;
-    if (tmx.measureText(tst).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tst;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
-
 export function dialogueDraw() {
   if (!dlg) {
-    if (lastTxt !== '') { tcx.clearRect(0, 0, 448, 448); lastTxt = ''; }
+    if (lastTxt !== '') { clearText(tcx); lastTxt = ''; }
     return;
   }
   const by = V - 51;
@@ -68,11 +59,10 @@ export function dialogueDraw() {
   const key = dlg.i + '|' + vis;
   if (key === lastTxt) return;
   lastTxt = key;
-  tmx.clearRect(0, 0, 448, 448);
-  tmx.font = 'bold 15px ui-monospace,Menlo,Consolas,monospace';
-  tmx.textBaseline = 'alphabetic';
-  const x0 = 124, lines = wrap(s, 2 * V - x0 - 14);
-  let shown = vis.length, y = (by + 2) * 2 + 22;
+  // El texto empieza a la derecha del retrato.
+  const x0 = 62, lines = wrap(tcx, s, V - x0 - 7);
+  beginText(tcx);
+  let shown = vis.length, y = by + 13;
   for (const L of lines) {
     const part = L.slice(0, Math.max(0, shown));
     shown -= L.length + 1;
@@ -80,14 +70,10 @@ export function dialogueDraw() {
     let x = x0;
     // El nombre de quien habla, en amarillo.
     if (ci > 0 && L === lines[0]) {
-      tmx.fillStyle = '#f2d36a'; tmx.fillText(part.slice(0, ci + 1), x, y);
-      x += tmx.measureText(part.slice(0, ci + 1)).width;
-      tmx.fillStyle = '#ffffff'; tmx.fillText(part.slice(ci + 1), x, y);
-    } else { tmx.fillStyle = '#ffffff'; tmx.fillText(part, x, y); }
-    y += 19;
+      tcx.fillStyle = '#f2d36a'; tcx.fillText(part.slice(0, ci + 1), x, y);
+      x += tcx.measureText(part.slice(0, ci + 1)).width;
+      tcx.fillStyle = '#ffffff'; tcx.fillText(part.slice(ci + 1), x, y);
+    } else { tcx.fillStyle = '#ffffff'; tcx.fillText(part, x, y); }
+    y += LINE_H;
   }
-  const id = tmx.getImageData(0, 0, 448, 448), d = id.data;
-  for (let i = 3; i < d.length; i += 4) d[i] = d[i] > 95 ? 255 : 0;
-  tcx.clearRect(0, 0, 448, 448);
-  tcx.putImageData(id, 0, 0);
 }

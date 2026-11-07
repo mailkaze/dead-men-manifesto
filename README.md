@@ -11,7 +11,7 @@ La historia parece lineal, pero en cierto momento permite **viajar en el tiempo*
   - la coleta se balancea, se agita con el viento al correr y da un latigazo con el retroceso del disparo.
 - **Diálogos** con retrato (sin estilo chibi) y texto que aparece letra a letra.
 - **Habitación de Jessica:** fondo fijo, suelo caminable, 6 objetos para examinar y salida por abajo.
-- **Calle:** desplazamiento lateral infinito, con 5 edificios en bucle, ciudad de fondo con parallax y salida por la izquierda hacia la habitación.
+- **Calle:** desplazamiento lateral infinito, con 5 edificios en bucle, ciudad de fondo con parallax y salida por la izquierda hacia la habitación. Según camina Jessica, aparecen arriba textos sobre el año y la sociedad, sin pausar el juego (provisionales).
 - **Tráfico aleatorio** en los dos sentidos con 4 vehículos, cada uno con ruedas que giran.
 - **Campo de pruebas** con cajas destructibles, para probar el movimiento y el disparo.
 
@@ -70,6 +70,8 @@ src/
   input.ts              ← teclado, joystick y botones
   sprites.ts, player.ts ← fotogramas de Jessica, coleta, disparo
   dialogue.ts           ← diálogos con retrato
+  caption.ts, text.ts   ← textos informativos sin pausa; capas de texto nítidas
+  i18n/                 ← textos del juego por idioma (es.ts) y t('clave')
   scenes/               ← una escena por módulo (room, street, field) y su registro
 e2e/                    ← pruebas de Playwright (móvil emulado)
 assets/
@@ -134,7 +136,7 @@ Cada script se ejecuta con `python3 tools/art/<script>.py`; con `npm run dev` le
 - **Jugador:** `curFrame()` elige el fotograma según dirección y estado (idle / walk / run, con o sin disparo). La izquierda es la derecha reflejada.
 - **Coleta:** capa separada con muelle amortiguado (balanceo) y 6 fases de onda (viento al correr).
 - **Balas con altura:** la colisión usa la posición en el suelo (`y + h`), no la de pantalla.
-- **Diálogos:** el texto se dibuja en una capa al doble de resolución y se umbraliza para que se vea pixelado.
+- **Texto:** diálogos y textos informativos se dibujan en capas propias (`#txt`, `#cap`) a la resolución real de la pantalla y con la fuente del sistema, para que se lean nítidos. Los textos nuevos van en `src/i18n/es.ts` por clave, preparados para añadir inglés.
 - **Tráfico:** dos carriles con sentidos opuestos; cada coche frena detrás del de delante y el giro de las ruedas va ligado a la distancia recorrida.
 
 ## Próximos pasos

@@ -7,7 +7,7 @@ html,body{margin:0;height:100%;background:#16131c;color:#d9cfbd;font-family:syst
 #app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:520px;margin:0 auto}
 #wrap{padding:max(10px,env(safe-area-inset-top)) 10px 0}
 #screen{width:100%;aspect-ratio:1/1;image-rendering:pixelated;image-rendering:crisp-edges;display:block;border-radius:8px;background:#000;box-shadow:0 0 0 3px #2a2433,0 8px 24px #0008}
-#txt{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+#txt,#cap{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #scn{position:absolute;top:34px;left:50%;transform:translateX(-50%);background:#2c2638;border:1px solid #ffffff22;border-radius:16px;padding:7px 14px;font-size:12px;font-weight:600;white-space:nowrap;color:#e8dcc4}
 #pad{flex:1;position:relative;min-height:230px}
 #hint{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;white-space:nowrap;opacity:.55;pointer-events:none}
@@ -24,7 +24,7 @@ html,body{margin:0;height:100%;background:#16131c;color:#d9cfbd;font-family:syst
 #btnB{width:64px;height:64px;right:118px;bottom:calc(46px + env(safe-area-inset-bottom));background:#3d6f8c;font-size:22px}
 </style></head><body>
 <div id="app">
- <div id="wrap"><div style="position:relative"><canvas id="screen" width="224" height="224"></canvas><canvas id="txt" width="448" height="448"></canvas></div></div>
+ <div id="wrap"><div style="position:relative"><canvas id="screen" width="224" height="224"></canvas><canvas id="cap" width="448" height="448" style="opacity:0"></canvas><canvas id="txt" width="448" height="448"></canvas></div></div>
  <div id="pad">
   <div id="hint">Joystick a la izquierda · A dispara o examina · B corre (▲ arrastra para fijar)</div>
   <div id="scn">Ir al campo de pruebas ▸</div>

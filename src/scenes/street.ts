@@ -2,7 +2,9 @@ import buildingsData from '../../assets/street/buildings.json';
 import vehiclesData from '../../assets/vehicles/vehicles.json';
 import groundUrl from '../../assets/street/ground.png';
 import skylineUrl from '../../assets/street/skyline.png';
+import { showCaption } from '../caption';
 import { V, ctx, loadImage, mk, world } from '../core';
+import { t, type TextKey } from '../i18n';
 import { pl } from '../player';
 import { bulletPoly, walkPoly, type Hotspot, type Scene } from './scene';
 
@@ -30,6 +32,17 @@ interface Car { l: number; x: number; k: Vehicle; v: number; cur: number; d: num
 
 // Dos carriles con sentidos opuestos.
 const LANES = [{ y: GY + 77, dir: -1 }, { y: GY + 105, dir: 1 }];
+
+// Información del año que aparece al pasar hacia la derecha por cada punto, una vez por partida
+// (flag streetInfo1, streetInfo2...). Separados unos 450 px, lo que se tarda en leer cada uno andando.
+const INFO: { x: number; key: TextKey }[] = [
+  { x: 70, key: 'street.info.1' },
+  { x: 520, key: 'street.info.2' },
+  { x: 970, key: 'street.info.3' },
+  { x: 1420, key: 'street.info.4' },
+  { x: 1870, key: 'street.info.5' },
+  { x: 2320, key: 'street.info.6' },
+];
 
 function flipped(img: HTMLImageElement): HTMLCanvasElement {
   const c = mk(img.width, img.height), x = c.getContext('2d')!;
@@ -88,10 +101,23 @@ export async function load(): Promise<Scene> {
     return best;
   }
 
+  let lastX = 0;
+  function updateInfo() {
+    INFO.forEach((info, i) => {
+      const flag = `streetInfo${i + 1}`;
+      if (!world.flags[flag] && lastX < info.x && pl.x >= info.x) {
+        world.flags[flag] = true;
+        showCaption(t(info.key));
+      }
+    });
+    lastX = pl.x;
+  }
+
   // ---------- tráfico ----------
   let cars: Car[] = [], laneT = [1.2, 2.8];
 
   function update(dt: number) {
+    updateInfo();
     const cx = Math.max(0, pl.x - V / 2);
     for (let l = 0; l < 2; l++) {
       laneT[l] -= dt;
@@ -152,7 +178,7 @@ export async function load(): Promise<Scene> {
     blocked: walkPoly([[4, GY + 9], [1e9, GY + 9], [1e9, GY + 47], [4, GY + 47]]),
     bulletHit: bulletPoly([[-60, GY + 2], [1e9, GY + 2], [1e9, 240], [-60, 240]]),
     hotspot,
-    enter() { cars = []; laneT = [1.2, 2.8]; },
+    enter() { cars = []; laneT = [1.2, 2.8]; lastX = pl.x; },
     update,
     drawFront,
   };

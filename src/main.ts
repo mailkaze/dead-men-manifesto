@@ -1,3 +1,4 @@
+import { captionDraw, captionUpdate, clearCaptions } from './caption';
 import { V, ctx, puff, world } from './core';
 import { dialogueDraw, dialogueUpdate, isTalking, say } from './dialogue';
 import { inp, keys, onSceneButton, setLabelA, setSceneButtonLabel } from './input';
@@ -18,6 +19,7 @@ function setScene(s: Scene, spawn: Spawn = s.spawn) {
   [pl.x, pl.y, pl.dir] = spawn;
   document.body.dataset.scene = s.id;
   setSceneButtonLabel(s.story ? 'Ir al campo de pruebas ▸' : '◂ Volver a la historia');
+  clearCaptions();
   s.enter?.();
   prefetchNeighbors(s);
 }
@@ -26,6 +28,7 @@ function setScene(s: Scene, spawn: Spawn = s.spawn) {
 function startFade(to: SceneId, spawn: Spawn) {
   fade = { t: 0, to, spawn, done: false };
   pl.cd = .4;
+  clearCaptions();
   loadScene(to).catch(() => {});
 }
 
@@ -57,6 +60,7 @@ function update(dt: number) {
     world.parts = world.parts.filter(p => p.life > 0);
     return;
   }
+  captionUpdate(dt);
 
   let mx = inp.jx, my = inp.jy;
   const kx = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
@@ -173,6 +177,7 @@ function draw() {
     ctx.fillRect(x + m.vx * 3 - 1, y + m.vy * 3 - 1, 3, 3); ctx.fillRect(x + m.vx * 5, y + m.vy * 5, 1, 1);
     ctx.fillRect(x - 1 + (m.vy ? -2 : 0), y - 1 + (m.vx ? -2 : 0), 1, 1); ctx.fillRect(x + 1 + (m.vy ? 2 : 0), y + 1 + (m.vx ? 2 : 0), 1, 1);
   }
+  captionDraw();
   if (fade) {
     const a = fade.t < .3 ? fade.t / .3 : Math.max(0, 1 - (fade.t - .3) / .3);
     ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, V, V); ctx.globalAlpha = 1;

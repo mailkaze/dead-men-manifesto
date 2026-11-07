@@ -10,3 +10,4 @@
 - Respeta fielmente los diseños del usuario. No inventes un diseño propio si te ha dado una referencia.
 - Antes de dar algo por terminado, ábrelo en un navegador sin interfaz (Playwright), revisa los errores de consola y mira capturas de los estados afectados: `npm run typecheck && npm test && npm run test:e2e` deja una captura de cada estado con nombre en `screenshots/`.
 - Los textos de diálogo que no ha escrito el usuario son provisionales; dilo cuando los añadas.
+- El juego podrá estar en español e inglés: los textos visibles van en `src/i18n/es.ts` por clave y se usan con `t('clave')`, nunca escritos en el código de las escenas. Los textos de la demo aún no siguen esta regla; se migrarán al sustituirlos.
