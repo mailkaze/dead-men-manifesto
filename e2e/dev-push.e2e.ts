@@ -14,3 +14,12 @@ test('el servidor de desarrollo envía un estado a los dispositivos conectados',
   await expect(page.locator('body')).toHaveAttribute('data-scene', 'street');
   await expect(page.locator('#lblA')).toHaveText('Examinar');
 });
+
+test('un estado enviado no saca la página de este servidor', async ({ page, request, baseURL }) => {
+  const connected = page.waitForEvent('console', m => m.text().includes('[vite] connected'));
+  await page.goto(`${baseURL}//evil.example/?state=room`);
+  await connected;
+  await request.get('/__dev/goto?state=street');
+  await expect(page.locator('body')).toHaveAttribute('data-scene', 'street');
+  expect(new URL(page.url()).host).toBe(new URL(baseURL!).host);
+});

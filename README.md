@@ -17,7 +17,7 @@ La historia parece lineal, pero en cierto momento permite **viajar en el tiempo*
 
 ## Cómo jugar
 
-Requisitos: Node 20.19+ (o 22.12+).
+Requisitos: Node 22.12+.
 
 ```bash
 npm install

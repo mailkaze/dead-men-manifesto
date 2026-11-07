@@ -205,6 +205,7 @@ boot().catch(err => console.error('No se pudo arrancar el juego:', err));
 // Solo en desarrollo: el servidor puede mandar a todos los dispositivos conectados a un estado (ver vite.config.ts).
 if (import.meta.hot) {
   import.meta.hot.on('dmm:goto', ({ query }: { query: string }) => {
-    location.href = `${location.pathname}?${query}`;
+    // Solo cambia la query: así la página nunca sale de este servidor.
+    location.search = query;
   });
 }
