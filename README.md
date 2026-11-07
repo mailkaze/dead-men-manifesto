@@ -38,6 +38,20 @@ Añade `?state=<nombre>` a la URL. Los estados con nombre están en [`src/preset
 
 Cualquier estado se puede ajustar con `scene`, `x`, `y`, `dir` (`down`, `up`, `left`, `right`) y `flags` (lista separada por comas: `nombre` vale `true`; `nombre=valor` admite números, `true`/`false` o texto). Por ejemplo, `/?state=street&x=600&flags=metBoss,day=2`. Si `scene` cambia de escena, la posición del estado base se descarta.
 
+### Probar en el móvil
+
+1. Ejecuta `npm run dev` en el ordenador. Muestra la URL de red (`http://192.168.x.x:5173/`) y un QR para abrirla.
+2. Abre esa URL en el móvil, conectado a la misma wifi. La primera vez, macOS puede pedir permiso para que Node acepte conexiones entrantes.
+3. Con el juego abierto en el móvil, envía cualquier estado desde el ordenador:
+
+   ```bash
+   curl 'http://localhost:5173/__dev/goto?state=street-genetech'
+   ```
+
+   Admite los mismos ajustes que la URL. Todos los dispositivos conectados saltan a ese estado, y al guardar un cambio de código la página se recarga en ese mismo estado.
+
+El servidor de desarrollo es visible para toda la red local: úsalo solo en redes de confianza.
+
 | Acción | Móvil | Teclado |
 |---|---|---|
 | Moverse | Joystick flotante (mitad izquierda) | WASD / flechas |
