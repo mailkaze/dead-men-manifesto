@@ -1,0 +1,37 @@
+[
+ {
+  "src": "__ASSET:assets/street/building_arcade.png__",
+  "w": 272,
+  "h": 148,
+  "door": 151,
+  "t": "JESSICA: El salón recreativo. De niña me pasaba aquí las tardes enteras."
+ },
+ {
+  "src": "__ASSET:assets/street/building_genetech.png__",
+  "w": 405,
+  "h": 293,
+  "door": 133,
+  "t": "JESSICA: Gene-Tech... Nunca he visto entrar ni salir a nadie de este edificio."
+ },
+ {
+  "src": "__ASSET:assets/street/building_bistro.png__",
+  "w": 295,
+  "h": 205,
+  "door": 209,
+  "t": "JESSICA: El Neo-Bistro. El café es malo, pero no cierran en toda la noche."
+ },
+ {
+  "src": "__ASSET:assets/street/building_bluetech.png__",
+  "w": 285,
+  "h": 183,
+  "door": 179,
+  "t": "JESSICA: Puertas automáticas y ni un cartel. Aquí pasa algo raro."
+ },
+ {
+  "src": "__ASSET:assets/street/building_industrial.png__",
+  "w": 377,
+  "h": 272,
+  "door": 129,
+  "t": "JESSICA: Cámaras, antenas, puertas blindadas... Mejor no acercarme demasiado."
+ }
+]

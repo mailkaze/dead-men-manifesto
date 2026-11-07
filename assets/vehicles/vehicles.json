@@ -1,0 +1,128 @@
+[
+ {
+  "name": "suv",
+  "w": 162,
+  "h": 86,
+  "wb": 84,
+  "r": 15.33,
+  "wheels": [
+   {
+    "x": 19,
+    "y": 54,
+    "w": 30,
+    "h": 30
+   },
+   {
+    "x": 118,
+    "y": 54,
+    "w": 30,
+    "h": 30
+   }
+  ],
+  "fw": 30,
+  "fh": 30,
+  "speed": [
+   75,
+   125
+  ],
+  "exhaust": true,
+  "body": "__ASSET:assets/vehicles/suv_body.png__",
+  "strip": "__ASSET:assets/vehicles/suv_wheels.png__"
+ },
+ {
+  "name": "sport",
+  "w": 136,
+  "h": 37,
+  "wb": 36,
+  "r": 10.89,
+  "wheels": [
+   {
+    "x": 15,
+    "y": 14,
+    "w": 21,
+    "h": 22
+   },
+   {
+    "x": 95,
+    "y": 14,
+    "w": 21,
+    "h": 22
+   }
+  ],
+  "fw": 21,
+  "fh": 22,
+  "speed": [
+   120,
+   170
+  ],
+  "exhaust": true,
+  "body": "__ASSET:assets/vehicles/sport_body.png__",
+  "strip": "__ASSET:assets/vehicles/sport_wheels.png__"
+ },
+ {
+  "name": "truck",
+  "w": 215,
+  "h": 115,
+  "wb": 114,
+  "r": 16.89,
+  "wheels": [
+   {
+    "x": 22,
+    "y": 81,
+    "w": 33,
+    "h": 33
+   },
+   {
+    "x": 62,
+    "y": 81,
+    "w": 34,
+    "h": 33
+   },
+   {
+    "x": 157,
+    "y": 80,
+    "w": 33,
+    "h": 34
+   }
+  ],
+  "fw": 34,
+  "fh": 34,
+  "speed": [
+   55,
+   85
+  ],
+  "exhaust": true,
+  "body": "__ASSET:assets/vehicles/truck_body.png__",
+  "strip": "__ASSET:assets/vehicles/truck_wheels.png__"
+ },
+ {
+  "name": "wagon",
+  "w": 136,
+  "h": 50,
+  "wb": 49,
+  "r": 10.84,
+  "wheels": [
+   {
+    "x": 97,
+    "y": 28,
+    "w": 22,
+    "h": 21
+   },
+   {
+    "x": 15,
+    "y": 28,
+    "w": 21,
+    "h": 21
+   }
+  ],
+  "fw": 22,
+  "fh": 21,
+  "speed": [
+   80,
+   120
+  ],
+  "exhaust": false,
+  "body": "__ASSET:assets/vehicles/wagon_body.png__",
+  "strip": "__ASSET:assets/vehicles/wagon_wheels.png__"
+ }
+]
