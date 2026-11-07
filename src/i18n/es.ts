@@ -1,10 +1,19 @@
 // Textos del juego en español. Las claves son las mismas para cada idioma.
-// Provisionales (escritos por Claude a partir del resumen del argumento): pendientes de los textos del autor.
 export default {
-  'street.info.1': 'Año 3141. El mundo vive la época más próspera de su historia.',
-  'street.info.2': 'No existen el crimen ni la corrupción, y las necesidades de todos están cubiertas.',
-  'street.info.3': 'Gobierna la Aretocracia: solo los más virtuosos llegan al poder.',
-  'street.info.4': 'Todo empezó hace mil años, con la revolución de Kalixto y August.',
-  'street.info.5': 'De aquella guerra apenas queda nada: un pulso electromagnético borró todos los datos.',
-  'street.info.6': 'Hoy, la teniente Jessica Hammer viajará al pasado para conocerlos.',
+  // Del autor.
+  'room.intro.1': 'JESSICA: Al fin amanece...',
+  'room.intro.2': 'JESSICA: Es el día más importante de mi vida y no he podido pegar ojo.',
+  'room.intro.3': 'JESSICA: Será mejor que me presente ya en el Laboratorio, no puedo esperar más.',
+  'room.exit.forgot': 'JESSICA: Creo que se me olvida algo...',
+  'item.idCard.name': 'Tarjeta de identificación para el Laboratorio Militar de Ciencias Avanzadas',
+  'street.info.1': 'Corre el año 3141, vivimos el momento más próspero de nuestra historia.',
+  'street.info.2': 'La corrupción y el crimen son cosa del pasado.',
+  'street.info.3': 'El mundo vive un periodo de paz de 900 años, gracias a los padres fundadores de nuestra sociedad: la Aretocracia.',
+  'street.info.4': 'No sabemos apenas nada de ellos o de lo que ocurrió en la guerra de la revolución, pero lo que hicieron, sin duda salvó el mundo.',
+
+  // Provisionales (Claude): mochila y aviso de objeto conseguido.
+  'inventory.title': 'Mochila',
+  'inventory.empty': 'La mochila está vacía.',
+  'inventory.close': 'Cerrar',
+  'item.idCard.obtained': 'Has conseguido la Tarjeta de identificación para el Laboratorio Militar de Ciencias Avanzadas.',
 };

@@ -1,11 +1,14 @@
 import { captionDraw, captionUpdate, clearCaptions } from './caption';
 import { V, ctx, puff, world } from './core';
 import { dialogueDraw, dialogueUpdate, isTalking, say } from './dialogue';
-import { inp, keys, onSceneButton, setLabelA, setSceneButtonLabel } from './input';
+import { t } from './i18n';
+import { inp, keys, onInventoryButton, onSceneButton, setLabelA, setSceneButtonLabel } from './input';
+import { isInventoryOpen, toggleInventory } from './inventory';
+import { isItemId } from './items';
 import { drawPlayer, pl, shoot, updateTail } from './player';
 import { PRESETS } from './presets';
 import { getScene, loadScene, prefetchNeighbors, sceneStatus } from './scenes';
-import type { Drawable, Scene, Spawn } from './scenes/scene';
+import type { Drawable, Exit, Scene, Spawn } from './scenes/scene';
 import { stateFromQuery, type SceneId } from './state';
 
 let scene!: Scene;
@@ -36,6 +39,20 @@ onSceneButton(() => {
   loadScene(scene.story ? 'field' : lastStory).then(s => setScene(s), () => {});
 });
 
+// La mochila no se abre durante un diálogo o un fundido; cerrarla siempre se puede.
+onInventoryButton(() => {
+  if (isInventoryOpen()) toggleInventory(false);
+  else if (!isTalking() && !fade) toggleInventory(true);
+});
+
+// Retrocede un paso desde una salida cerrada para no volver a pisarla al cerrar el mensaje.
+function stepBack(e: Exit) {
+  if (e.dir === 'down') pl.y = e.y0 - 4;
+  else if (e.dir === 'up') pl.y = e.y1 + 4;
+  else if (e.dir === 'left') pl.x = e.x1 + 4;
+  else pl.x = e.x0 - 4;
+}
+
 // ---------- update ----------
 function update(dt: number) {
   world.t += dt;
@@ -51,6 +68,12 @@ function update(dt: number) {
       }
     }
     if (fade.t >= .62) fade = null;
+    inp.aPress = false;
+    return;
+  }
+  // Con la mochila abierta el juego se detiene; A también la cierra.
+  if (isInventoryOpen()) {
+    if (inp.aPress) toggleInventory(false);
     inp.aPress = false;
     return;
   }
@@ -72,7 +95,11 @@ function update(dt: number) {
 
   // A examina si hay algo cerca; si no, dispara.
   const hs = scene.hotspot(pl.x, pl.y);
-  if (inp.aPress && hs && pl.shootT <= 0) { inp.aPress = false; inp.a = false; say(hs.t); return; }
+  if (inp.aPress && hs && pl.shootT <= 0) {
+    inp.aPress = false; inp.a = false;
+    if (hs.use) hs.use(); else say(hs.t);
+    return;
+  }
   if ((inp.aPress || inp.a !== false) && pl.cd <= 0 && !hs) shoot();
   inp.aPress = false;
 
@@ -100,7 +127,11 @@ function update(dt: number) {
 
   if (moving) for (const e of scene.exits) {
     const pushing = e.dir === 'down' ? my > .3 : e.dir === 'up' ? my < -.3 : e.dir === 'left' ? mx < -.3 : mx > .3;
-    if (pl.x >= e.x0 && pl.x <= e.x1 && pl.y >= e.y0 && pl.y <= e.y1 && pushing) { startFade(e.to, e.spawn); break; }
+    if (pl.x >= e.x0 && pl.x <= e.x1 && pl.y >= e.y0 && pl.y <= e.y1 && pushing) {
+      const lines = e.locked?.();
+      if (lines) { say(lines); stepBack(e); } else startFade(e.to, e.spawn);
+      break;
+    }
   }
   updateTail(dt);
 
@@ -187,8 +218,7 @@ function draw() {
 // ---------- arranque ----------
 let last = 0;
 function loop(now: number) {
-  const talking = isTalking();
-  setLabelA(talking ? 'Continuar' : scene.hotspot(pl.x, pl.y) ? 'Examinar' : 'Disparar');
+  setLabelA(isInventoryOpen() ? t('inventory.close') : isTalking() ? 'Continuar' : scene.hotspot(pl.x, pl.y) ? 'Examinar' : 'Disparar');
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000));
   last = now;
   update(dt); draw(); dialogueDraw();
@@ -200,6 +230,10 @@ async function boot() {
   const { state, warnings } = stateFromQuery(location.search, PRESETS);
   for (const w of warnings) console.warn(w);
   world.flags = { ...state.flags };
+  world.items = [];
+  for (const id of state.items ?? []) {
+    if (isItemId(id)) world.items.push(id); else console.warn(`Objeto desconocido: "${id}".`);
+  }
   const s = await loadScene(state.scene);
   setScene(s, [state.x ?? s.spawn[0], state.y ?? s.spawn[1], state.dir ?? s.spawn[2]]);
   last = performance.now();

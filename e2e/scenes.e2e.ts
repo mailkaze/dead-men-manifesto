@@ -33,7 +33,7 @@ test('la posición del estado se aplica: frente a Gene-Tech se puede examinar', 
 });
 
 test('salir de la habitación por abajo lleva a la calle', async ({ page }) => {
-  await page.goto('/?state=room&x=150&y=146');
+  await page.goto('/?state=room&x=150&y=146&items=idCard');
   await expect(scene(page)).toHaveAttribute('data-scene', 'room');
   await page.keyboard.down('ArrowDown');
   await expect(scene(page)).toHaveAttribute('data-scene', 'street');
@@ -51,4 +51,22 @@ test('el botón de escena va al campo de pruebas y vuelve a la calle sin quedars
   await page.keyboard.down('ShiftLeft');
   await page.keyboard.down('ArrowLeft');
   await expect(scene(page)).toHaveAttribute('data-scene', 'room', { timeout: 5000 });
+});
+
+test('la partida nueva empieza con el texto de Jessica al amanecer', async ({ page }) => {
+  await page.goto('/?state=new-game');
+  const txt = page.locator('#txt');
+  const lines = [
+    'JESSICA: Al fin amanece...',
+    'JESSICA: Es el día más importante de mi vida y no he podido pegar ojo.',
+    'JESSICA: Será mejor que me presente ya en el Laboratorio, no puedo esperar más.',
+  ];
+  for (const line of lines) {
+    await expect(txt).toHaveAttribute('data-text', line);
+    // Primera pulsación: completa el texto; segunda: pasa a la siguiente frase.
+    // Separadas: dos pulsaciones dentro del mismo fotograma cuentan como una.
+    for (let i = 0; i < 2; i++) { await page.keyboard.press('Space'); await page.waitForTimeout(100); }
+  }
+  await expect(txt).not.toHaveAttribute('data-text');
+  await expect(page.locator('#lblA')).not.toHaveText('Continuar');
 });

@@ -15,10 +15,12 @@ const B_KEYS = ['ShiftLeft', 'ShiftRight', 'KeyX', 'KeyK'];
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const pad = $('pad'), base = $('joyBase'), knob = $('joyKnob'), bA = $('btnA'), bB = $('btnB');
-const lblA = $('lblA'), lblB = $('lblB'), scn = $('scn');
+const lblA = $('lblA'), lblB = $('lblB'), scn = $('scn'), btnInv = $('btnInv');
 
 let sceneButton = () => {};
 export function onSceneButton(cb: () => void) { sceneButton = cb; }
+let inventoryButton = () => {};
+export function onInventoryButton(cb: () => void) { inventoryButton = cb; }
 export function setSceneButtonLabel(text: string) { scn.textContent = text; }
 
 let lastLabelA = lblA.textContent;
@@ -42,6 +44,7 @@ function toggleLock(on: boolean) {
 addEventListener('keydown', e => {
   if (GAMEKEYS.includes(e.code)) e.preventDefault();
   if (e.code === 'KeyR' && !e.repeat) toggleLock(!inp.runLock);
+  if (e.code === 'KeyI' && !e.repeat) inventoryButton();
   keys[e.code] = 1;
   if (A_KEYS.includes(e.code)) { if (!inp.a) inp.aPress = true; inp.a = true; }
   if (B_KEYS.includes(e.code)) inp.b = true;
@@ -79,12 +82,14 @@ function inEl(el: HTMLElement, tc: Touch) {
 }
 
 scn.addEventListener('mousedown', () => sceneButton());
+btnInv.addEventListener('mousedown', () => inventoryButton());
 
 pad.addEventListener('touchstart', e => {
   e.preventDefault();
   const pr = pad.getBoundingClientRect();
   for (const tc of e.changedTouches) {
     if (inEl(scn, tc)) { sceneButton(); continue; }
+    if (inEl(btnInv, tc)) { inventoryButton(); continue; }
     if (near(bA, tc)) {
       if (inp.a === false) inp.aPress = true;
       inp.a = tc.identifier;
@@ -149,7 +154,7 @@ addEventListener('mouseup', () => { inp.a = false; inp.b = false; bTouch = null;
 addEventListener('resize', restJoy);
 restJoy();
 if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
-  $('hint').textContent = 'Teclado: WASD o flechas · Espacio o J dispara/examina · Shift o K corre · R fija correr';
+  $('hint').textContent = 'Teclado: WASD o flechas · Espacio o J dispara/examina · Shift o K corre · R fija correr · I mochila';
 }
 addEventListener('blur', () => { for (const k in keys) keys[k] = 0; inp.a = false; inp.b = false; setBtn(); });
 $('screen').addEventListener('mousedown', () => window.focus());

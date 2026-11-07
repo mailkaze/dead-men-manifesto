@@ -36,7 +36,7 @@ export function dialogueUpdate(dt: number): boolean {
 
 export function dialogueDraw() {
   if (!dlg) {
-    if (lastTxt !== '') { clearText(tcx); lastTxt = ''; }
+    if (lastTxt !== '') { clearText(tcx); lastTxt = ''; tcv.removeAttribute('data-text'); }
     return;
   }
   const by = V - 51;
@@ -44,13 +44,15 @@ export function dialogueDraw() {
   ctx.fillStyle = '#f4f0e6'; ctx.fillRect(2, by + 1, V - 4, 48);
   ctx.fillStyle = '#0f1d66'; ctx.fillRect(3, by + 2, V - 6, 46);
   ctx.fillStyle = '#0a1450'; ctx.fillRect(3, by + 45, V - 6, 3);
-  if (POR.complete) {
+  const s = dlg.q[dlg.i], vis = s.slice(0, Math.floor(dlg.n)), done = dlg.n >= s.length;
+  // Retrato solo cuando habla Jessica; los avisos del juego van a todo lo ancho.
+  const portrait = s.startsWith('JESSICA:');
+  if (portrait && POR.complete) {
     const bob = Math.floor(world.t * 1.3) % 2;
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, V, by + 48); ctx.clip();
     ctx.drawImage(POR, 4, by + 48 - POR.height + bob + 1);
     ctx.restore();
   }
-  const s = dlg.q[dlg.i], vis = s.slice(0, Math.floor(dlg.n)), done = dlg.n >= s.length;
   // Flecha de "continuar" parpadeando.
   if (done && Math.floor(world.t * 3) % 2) {
     ctx.fillStyle = '#f4f0e6';
@@ -59,8 +61,9 @@ export function dialogueDraw() {
   const key = dlg.i + '|' + vis;
   if (key === lastTxt) return;
   lastTxt = key;
-  // El texto empieza a la derecha del retrato.
-  const x0 = 62, lines = wrap(tcx, s, V - x0 - 7);
+  tcv.dataset.text = s; // frase completa en curso (la usan las pruebas)
+  // Con retrato, el texto empieza a su derecha.
+  const x0 = portrait ? 62 : 9, lines = wrap(tcx, s, V - x0 - 7);
   beginText(tcx);
   let shown = vis.length, y = by + 13;
   for (const L of lines) {

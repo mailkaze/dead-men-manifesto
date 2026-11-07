@@ -2,8 +2,12 @@ import { inPoly, puff, type Bullet, type Point, type Poly } from '../core';
 import type { Dir, SceneId } from '../state';
 
 export type Spawn = readonly [number, number, Dir];
-export interface Hotspot { t: string[] }
-export interface Exit { x0: number; x1: number; y0: number; y1: number; dir: Dir; to: SceneId; spawn: Spawn }
+// Al examinar: si hay `use`, se ejecuta en lugar de decir `t`.
+export interface Hotspot { t: string[]; use?: () => void }
+export interface Exit {
+  x0: number; x1: number; y0: number; y1: number; dir: Dir; to: SceneId; spawn: Spawn;
+  locked?: () => string[] | null; // frases que se dicen si la salida está cerrada; null si está abierta
+}
 // Algo que se dibuja ordenado por su y en el suelo, junto a Jessica.
 export interface Drawable { y: number; draw(cx: number, cy: number): void }
 

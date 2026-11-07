@@ -34,14 +34,12 @@ interface Car { l: number; x: number; k: Vehicle; v: number; cur: number; d: num
 const LANES = [{ y: GY + 77, dir: -1 }, { y: GY + 105, dir: 1 }];
 
 // Información del año que aparece al pasar hacia la derecha por cada punto, una vez por partida
-// (flag streetInfo1, streetInfo2...). Separados unos 450 px, lo que se tarda en leer cada uno andando.
+// (flag streetInfo1, streetInfo2...). Separados lo que se tarda en leer cada uno andando.
 const INFO: { x: number; key: TextKey }[] = [
   { x: 70, key: 'street.info.1' },
-  { x: 520, key: 'street.info.2' },
-  { x: 970, key: 'street.info.3' },
-  { x: 1420, key: 'street.info.4' },
-  { x: 1870, key: 'street.info.5' },
-  { x: 2320, key: 'street.info.6' },
+  { x: 540, key: 'street.info.2' },
+  { x: 920, key: 'street.info.3' },
+  { x: 1530, key: 'street.info.4' },
 ];
 
 function flipped(img: HTMLImageElement): HTMLCanvasElement {

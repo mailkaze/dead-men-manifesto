@@ -10,6 +10,7 @@ export interface GameState {
   y?: number;
   dir?: Dir;
   flags: Flags;
+  items?: string[]; // inventario de Jessica (ids de src/items.ts)
 }
 
 export const SCENE_IDS: readonly SceneId[] = ['room', 'street', 'field'];
@@ -27,7 +28,7 @@ function toFlagValue(raw: string): FlagValue {
   return toNumber(raw) ?? raw;
 }
 
-// Lee ?state=<nombre> y los ajustes opcionales scene, x, y, dir y flags (a,b=2,c=texto).
+// Lee ?state=<nombre> y los ajustes opcionales scene, x, y, dir, flags (a,b=2,c=texto) e items (a,b).
 export function stateFromQuery(
   search: string,
   presets: Readonly<Record<string, GameState>>,
@@ -42,6 +43,7 @@ export function stateFromQuery(
   }
   const base = presets[name];
   const state: GameState = { ...base, flags: { ...base.flags } };
+  if (base.items) state.items = [...base.items];
 
   const scene = q.get('scene');
   if (scene !== null) {
@@ -74,6 +76,9 @@ export function stateFromQuery(
     if (!key.trim()) continue;
     state.flags[key.trim()] = rest.length ? toFlagValue(rest.join('=')) : true;
   }
+
+  const items = (q.get('items') ?? '').split(',').map(s => s.trim()).filter(Boolean);
+  if (items.length) state.items = [...new Set([...(state.items ?? []), ...items])];
 
   return { state, warnings };
 }

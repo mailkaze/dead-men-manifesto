@@ -1,7 +1,9 @@
 import roomUrl from '../../assets/scenes/room.png';
 import { ctx, loadImage, world, type Poly } from '../core';
 import { say } from '../dialogue';
-import { bulletPoly, nearestHotspot, walkPoly, type HotspotArea, type Scene } from './scene';
+import { t } from '../i18n';
+import { giveItem, hasItem } from '../inventory';
+import { bulletPoly, nearestHotspot, walkPoly, type Hotspot, type HotspotArea, type Scene } from './scene';
 
 // Habitación de Jessica: fondo fijo (imagen de Gemini ÷ 5), 6 objetos y salida por abajo a la calle.
 const WALK: Poly = [[62, 106], [103, 106], [114, 101], [156, 97], [204, 102], [219, 113], [262, 124], [266, 130], [246, 150], [62, 150]];
@@ -14,6 +16,9 @@ const HOTSPOTS: HotspotArea[] = [
   { x: 196, y: 106, r: 14, t: ['JESSICA: Otra noche sin dormir. No puedo dejar de pensar en esa máquina.'] },
   { x: 236, y: 121, r: 15, t: ['JESSICA: Cincuenta repeticiones más y quizá consiga dejar la mente en blanco.'] },
 ];
+// En el escritorio está la tarjeta de identificación hasta que Jessica la coge.
+const DESK = HOTSPOTS[3];
+const TAKE_CARD: Hotspot = { t: [], use: () => giveItem('idCard') };
 
 export async function load(): Promise<Scene> {
   const img = await loadImage(roomUrl);
@@ -23,16 +28,23 @@ export async function load(): Promise<Scene> {
     tint: true, dust: '#9a7a5c', shadow: 'rgba(20,8,10,.4)',
     spawn: [150, 126, 'down'],
     // En la calle aparece junto a la puerta, en la acera (y = suelo + 28).
-    exits: [{ x0: 62, x1: 246, y0: 147, y1: 999, dir: 'down', to: 'street', spawn: [34, 146, 'right'] }],
+    // Sin la tarjeta no sale.
+    exits: [{
+      x0: 62, x1: 246, y0: 147, y1: 999, dir: 'down', to: 'street', spawn: [34, 146, 'right'],
+      locked: () => hasItem('idCard') ? null : [t('room.exit.forgot')],
+    }],
     marks: [[155, 156]],
     drawBg: (cx, cy) => ctx.drawImage(img, -cx, -cy),
     blocked: walkPoly(WALK),
     bulletHit: bulletPoly(BULLETS),
-    hotspot: (x, y) => nearestHotspot(HOTSPOTS, x, y),
+    hotspot: (x, y) => {
+      const h = nearestHotspot(HOTSPOTS, x, y);
+      return h === DESK && !hasItem('idCard') ? TAKE_CARD : h;
+    },
     enter() {
       if (world.flags.introSeen) return;
       world.flags.introSeen = true;
-      say(['JESSICA: ...Otra vez ese sueño. La misma explosión, el mismo reloj parado.', 'JESSICA: Será mejor que me ponga en marcha. Echaré un vistazo antes de salir.']);
+      say([t('room.intro.1'), t('room.intro.2'), t('room.intro.3')]);
     },
   };
 }

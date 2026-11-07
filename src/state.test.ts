@@ -48,6 +48,14 @@ describe('stateFromQuery', () => {
     expect(state.flags).toEqual({ introSeen: false, crates: 3, era: '1999b', met: true });
   });
 
+  it('items se suman a los del estado sin repetirse', () => {
+    const presets: Record<string, GameState> = { ...PRESETS, lab: { scene: 'street', flags: {}, items: ['idCard'] } };
+    expect(stateFromQuery('?state=lab&items=map,idCard', presets).state.items).toEqual(['idCard', 'map']);
+    expect(stateFromQuery('?items=idCard', presets).state.items).toEqual(['idCard']);
+    expect(stateFromQuery('?state=lab', presets).state.items).toEqual(['idCard']);
+    expect(presets.lab.items).toEqual(['idCard']);
+  });
+
   it('no modifica los estados originales', () => {
     stateFromQuery('?state=street&x=1&flags=met', PRESETS);
     expect(PRESETS.street).toEqual({ scene: 'street', x: 34, y: 146, dir: 'right', flags: { introSeen: true } });

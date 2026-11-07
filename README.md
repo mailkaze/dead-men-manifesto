@@ -11,6 +11,7 @@ La historia parece lineal, pero en cierto momento permite **viajar en el tiempo*
   - la coleta se balancea, se agita con el viento al correr y da un latigazo con el retroceso del disparo.
 - **Diálogos** con retrato (sin estilo chibi) y texto que aparece letra a letra.
 - **Habitación de Jessica:** fondo fijo, suelo caminable, 6 objetos para examinar y salida por abajo.
+- **Mochila:** botón con icono de mochila (tecla I) que abre el inventario de Jessica y pausa el juego. En la habitación consigue la tarjeta de identificación del Laboratorio (en el escritorio); sin ella no puede salir.
 - **Calle:** desplazamiento lateral infinito, con 5 edificios en bucle, ciudad de fondo con parallax y salida por la izquierda hacia la habitación. Según camina Jessica, aparecen arriba textos sobre el año y la sociedad, sin pausar el juego (provisionales).
 - **Tráfico aleatorio** en los dos sentidos con 4 vehículos, cada uno con ruedas que giran.
 - **Campo de pruebas** con cajas destructibles, para probar el movimiento y el disparo.
@@ -36,7 +37,7 @@ Añade `?state=<nombre>` a la URL. Los estados con nombre están en [`src/preset
 | `street-genetech` | Calle, frente a la puerta de Gene-Tech |
 | `field` | Campo de pruebas |
 
-Cualquier estado se puede ajustar con `scene`, `x`, `y`, `dir` (`down`, `up`, `left`, `right`) y `flags` (lista separada por comas: `nombre` vale `true`; `nombre=valor` admite números, `true`/`false` o texto). Por ejemplo, `/?state=street&x=600&flags=metBoss,day=2`. Si `scene` cambia de escena, la posición del estado base se descarta.
+Cualquier estado se puede ajustar con `scene`, `x`, `y`, `dir` (`down`, `up`, `left`, `right`), `flags` (lista separada por comas: `nombre` vale `true`; `nombre=valor` admite números, `true`/`false` o texto) e `items` (objetos de la mochila, ids de [`src/items.ts`](src/items.ts)). Por ejemplo, `/?state=street&x=600&flags=metBoss,day=2` o `/?state=room&items=idCard`. Si `scene` cambia de escena, la posición del estado base se descarta.
 
 ### Probar en el móvil
 
@@ -71,6 +72,7 @@ src/
   sprites.ts, player.ts ← fotogramas de Jessica, coleta, disparo
   dialogue.ts           ← diálogos con retrato
   caption.ts, text.ts   ← textos informativos sin pausa; capas de texto nítidas
+  items.ts, inventory.ts ← catálogo de objetos; inventario de Jessica y mochila
   i18n/                 ← textos del juego por idioma (es.ts) y t('clave')
   scenes/               ← una escena por módulo (room, street, field) y su registro
 e2e/                    ← pruebas de Playwright (móvil emulado)

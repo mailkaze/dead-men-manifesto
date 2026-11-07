@@ -1,3 +1,4 @@
+import type { ItemId } from './items';
 import type { Flags } from './state';
 
 // Núcleo compartido: lienzo, resolución interna y estado mutable del mundo.
@@ -24,6 +25,7 @@ export const world = {
   bullets: [] as Bullet[],
   parts: [] as Particle[],
   flags: {} as Flags,
+  items: [] as ItemId[],
 };
 
 export function mk(w: number, h: number): HTMLCanvasElement {

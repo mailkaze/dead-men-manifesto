@@ -22,9 +22,21 @@ html,body{margin:0;height:100%;background:#16131c;color:#d9cfbd;font-family:syst
 #btnB.lock{background:#d9952e;box-shadow:0 0 0 4px #d9952e55,0 5px 0 #0009}
 #btnB .up{position:absolute;top:-17px;bottom:auto;font-size:12px;opacity:.45}
 #btnB{width:64px;height:64px;right:118px;bottom:calc(46px + env(safe-area-inset-bottom));background:#3d6f8c;font-size:22px}
+#btnInv{width:52px;height:52px;right:16px;top:30px;background:#5b4636}
+#btnInv svg{width:30px;height:30px;shape-rendering:crispEdges}
+#inv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000a;border-radius:8px}
+#inv[hidden]{display:none}
+.inv-box{width:86%;max-height:80%;overflow:auto;background:#0f1d66;border:3px solid #f4f0e6;box-shadow:0 0 0 2px #55505e;border-radius:4px;color:#fff;font:600 15px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.inv-head{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;color:#f2d36a;border-bottom:2px solid #0a1450}
+#invClose{background:none;border:0;color:#f4f0e6;font:inherit;font-size:18px;padding:0 4px;cursor:pointer}
+#invList{list-style:none;margin:0;padding:6px 10px 10px}
+#invList li{padding:6px 0;line-height:1.3}
+#invList li.empty{opacity:.7;font-weight:500}
 </style></head><body>
 <div id="app">
- <div id="wrap"><div style="position:relative"><canvas id="screen" width="224" height="224"></canvas><canvas id="cap" width="448" height="448" style="opacity:0"></canvas><canvas id="txt" width="448" height="448"></canvas></div></div>
+ <div id="wrap"><div style="position:relative"><canvas id="screen" width="224" height="224"></canvas><canvas id="cap" width="448" height="448" style="opacity:0"></canvas><canvas id="txt" width="448" height="448"></canvas>
+  <div id="inv" hidden><div class="inv-box"><div class="inv-head"><span id="invTitle"></span><button id="invClose" aria-label="Cerrar">✕</button></div><ul id="invList"></ul></div></div>
+ </div></div>
  <div id="pad">
   <div id="hint">Joystick a la izquierda · A dispara o examina · B corre (▲ arrastra para fijar)</div>
   <div id="scn">Ir al campo de pruebas ▸</div>
@@ -32,6 +44,12 @@ html,body{margin:0;height:100%;background:#16131c;color:#d9cfbd;font-family:syst
   <div id="joyBase" class="joy"></div><div id="joyKnob" class="joy"></div>
   <div id="btnB" class="btn">B<span class="up">▲</span><span id="lblB">Correr</span></div>
   <div id="btnA" class="btn">A<span id="lblA">Disparar</span></div>
+  <div id="btnInv" class="btn"><svg viewBox="0 0 16 16" aria-hidden="true">
+   <rect x="5" y="0" width="6" height="1" fill="#1e161e"/><rect x="4" y="1" width="1" height="3" fill="#1e161e"/><rect x="11" y="1" width="1" height="3" fill="#1e161e"/>
+   <rect x="1" y="3" width="14" height="13" fill="#1e161e"/><rect x="2" y="4" width="12" height="11" fill="#9a6a3a"/>
+   <rect x="2" y="4" width="12" height="4" fill="#7a4c28"/><rect x="2" y="8" width="12" height="1" fill="#1e161e"/>
+   <rect x="7" y="7" width="2" height="2" fill="#e8c060"/><rect x="4" y="10" width="8" height="4" fill="#b8844e"/><rect x="4" y="10" width="8" height="1" fill="#1e161e"/>
+  </svg><span id="lblInv"></span></div>
  </div>
 </div>
 <script type="module" src="/src/main.ts"></script>
